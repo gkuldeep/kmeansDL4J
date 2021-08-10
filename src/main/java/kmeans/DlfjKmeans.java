@@ -51,7 +51,7 @@ public class DlfjKmeans  {
          //csvReader
          //it.next();
 
-        //recordReaderTrain.
+        //recordReaderTrain.asdasd
         List<Point>points=new ArrayList<>();
 
         Schema schema = new Schema.Builder()
