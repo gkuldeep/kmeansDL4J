@@ -18,10 +18,10 @@ public class KmeansNew {
     public static void main(String[] args) throws IOException, InterruptedException {
         RecordReader recordReader = new CSVRecordReader(1,',');
         recordReader.initialize(new FileSplit(
-                new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\taskassignmentN1.csv")));
+                new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv")));
 
 
-        DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, 150, 7, 2);
+        DataSetIterator iterator = new RecordReaderDataSetIterator(recordReader, 150, 7, 0);
         //iterator.next();
 
 

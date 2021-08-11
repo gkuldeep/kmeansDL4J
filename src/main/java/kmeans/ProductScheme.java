@@ -8,6 +8,8 @@ import org.deeplearning4j.clustering.cluster.Point;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -150,6 +152,7 @@ public class ProductScheme {
 
         mode[7] = tenureMap.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 
+
         setMissing(mode);
 
         Set<String> setPro = prodMap.keySet();
@@ -159,6 +162,39 @@ public class ProductScheme {
 
         setP(uniquePro);
         setS(uniqueScheme);
+        String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
+        StringBuilder outputToCSV = new StringBuilder();
+        outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
+        FileOutputStream writer = new FileOutputStream(new File(p));
+
+
+        iterator.next();
+        while (iterator.hasNext()) {
+            String[] row = iterator.next();
+            for(int i=0;i<row.length;i++){
+                if(row[i].isEmpty())
+                    row[i]=mode[i];
+            }
+            for(int i=0;i<row.length;i++){
+                outputToCSV.append(row[0]).append(",").append(row[1]).append(",").append(row[2]).append(",").append(row[3]).append(",")
+                        .append(row[4]).append(",").append(row[5]).append(",").append(row[6]).append(",").append(row[7]).append("\n");
+
+            }
+
+        }
+        writer.write(outputToCSV.toString().getBytes("UTF-8"));
+        //String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
+        //Dataset<Row>required = list.get(i).select("PRODUCT","prediction","Dist");
+        //List<Row> clusterFile = modes.collectAsList();
+       /* StringBuilder outputToCSV = new StringBuilder();
+        outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
+        FileOutputStream writer = new FileOutputStream(new File(p));*/
+
+       /* for(Row row :clusterFile){
+            outputToCSVi.append(row.get(0)).append(",").append(row.get(1)).append(",").append(row.get(2)).append(",").append(row.get(3)).append(",")
+                    .append(row.get(4)).append(",").append(row.get(5)).append(",").append(row.get(6)).append(",").append(row.get(7)).append("\n");
+        }*/
+       // writer.write(outputToCSV.toString().getBytes("UTF-8"));
        /* System.out.println(uniquePro);
         System.out.println(uniquePro.size());
         System.out.println(uniqueScheme);
