@@ -162,27 +162,7 @@ public class ProductScheme {
 
         setP(uniquePro);
         setS(uniqueScheme);
-        String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
-        StringBuilder outputToCSV = new StringBuilder();
-        outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
-        FileOutputStream writer = new FileOutputStream(new File(p));
-
-
-        iterator.next();
-        while (iterator.hasNext()) {
-            String[] row = iterator.next();
-            for(int i=0;i<row.length;i++){
-                if(row[i].isEmpty())
-                    row[i]=mode[i];
-            }
-            for(int i=0;i<row.length;i++){
-                outputToCSV.append(row[0]).append(",").append(row[1]).append(",").append(row[2]).append(",").append(row[3]).append(",")
-                        .append(row[4]).append(",").append(row[5]).append(",").append(row[6]).append(",").append(row[7]).append("\n");
-
-            }
-
-        }
-        writer.write(outputToCSV.toString().getBytes("UTF-8"));
+       // createFile(iterator, mode);
         //String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
         //Dataset<Row>required = list.get(i).select("PRODUCT","prediction","Dist");
         //List<Row> clusterFile = modes.collectAsList();
@@ -200,4 +180,29 @@ public class ProductScheme {
         System.out.println(uniqueScheme);
         System.out.println(uniqueScheme.size());*/
     }
+
+    private void createFile(Iterator<String[]> iterator, String[] mode) throws IOException {
+        String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
+        StringBuilder outputToCSV = new StringBuilder();
+        outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
+        FileOutputStream writer = new FileOutputStream(new File(p));
+
+
+        iterator.next();
+        while (iterator.hasNext()) {
+            String[] row = iterator.next();
+            for(int i=0;i<row.length;i++){
+                if(row[i].isEmpty())
+                    row[i]= mode[i];
+            }
+            //for(int i=0;i<row.length;i++){
+                outputToCSV.append(row[0]).append(",").append(row[1]).append(",").append(row[2]).append(",").append(row[3]).append(",")
+                        .append(row[4]).append(",").append(row[5]).append(",").append(row[6]).append(",").append(row[7]).append("\n");
+
+            //}
+
+        }
+        writer.write(outputToCSV.toString().getBytes("UTF-8"));
+    }
+
 }

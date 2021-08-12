@@ -249,8 +249,8 @@ public class DlfjKmeans  {
         //b.categoricalToOneHot(xfeatures.getColumn(0));
         xfeatures.getColumn(0);
 
-        OneHot oneHot = new OneHot(xfeatures.getColumn(0),xfeatures.getColumn(0),0);
-        System.out.println(oneHot);
+        /*OneHot oneHot = new OneHot(xfeatures.getColumn(0),xfeatures.getColumn(0),0);
+        System.out.println(oneHot);*/
        // oneHot.
        // Word2Vec w = new Word2Vec();
         //w.
@@ -311,12 +311,12 @@ public class DlfjKmeans  {
 
         }
 
-        File f = new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\center.zip");
+        File f = new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers");
 
 
 
 
-       // ModelSerializer.addObjectToFile(f,"center",cen);
+       ModelSerializer.addObjectToFile(f,"center",cen);
         //ModelSerializer.writeModel((Model) cen,f,true);
     }
 

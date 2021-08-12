@@ -28,11 +28,10 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
+import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
 import org.nd4j.linalg.factory.Nd4j;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -101,15 +100,38 @@ public class Transform {
                 .conditionalReplaceValueTransform("TENURE",new IntWritable(Integer.parseInt(mode[7])),new IntegerColumnCondition("TENURE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
 
 */
-
                 .build();
 
+        String[] arr ={"5000013","5000015","500000","24","10","10.5","20000","15"};
+        List<Writable> e=transformProcess.transformRawStringsToInput(arr);
+        List<Writable> exe=transformProcess.execute(e);
+        //INDArray p =exe.toArray();
+         Object[] userData=  exe.toArray();
+        double[] convertedArray = Arrays.stream(userData) // converts to a stream
+                .mapToDouble(num -> Double.parseDouble(num.toString())) // change each value to Double
+                .toArray();
+        INDArray r = Nd4j.createFromArray(convertedArray);
 
+
+        /*String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\tpJson.txt";
+        StringBuilder outputToCSV = new StringBuilder();
+        //outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
+        FileOutputStream writer = new FileOutputStream(new File(p));
+        String tp=transformProcess.toJson();
+        outputToCSV.append(tp);
+        writer.write(outputToCSV.toString().getBytes("UTF-8"));*/
+        String tp=transformProcess.toJson();
+        FileWriter file1 = new FileWriter("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\tp.txt");
+        file1.write(tp);
+        file1.close();
+        //INDArray xfeatures = Nd4j.create(userData);
         RecordReader reader = new CSVRecordReader(1,','); /* first line to skip and comma seperated */
         reader.initialize(new FileSplit(new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv")));
         RecordReader transformProcessRecordReader = new TransformProcessRecordReader(reader,transformProcess);
         //Passing transformation process to convert the csv file
-        DataSetIterator iterator = new RecordReaderDataSetIterator(transformProcessRecordReader, 6000, 7, 0);
+
+
+        DataSetIterator iterator = new RecordReaderDataSetIterator(transformProcessRecordReader, 7000, 7, 0);
         //iterator.next();
 
 
@@ -123,10 +145,15 @@ public class Transform {
         System.out.println(iterator);
         List<INDArray>vec = new ArrayList<>();
         DataSet ds=iterator.next();
+
+        NormalizerSerializer saver = NormalizerSerializer.getDefault();
+        File file = new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\normalizer.txt");
+        saver.write(dataNormalization,file);
         INDArray a = ds.getFeatures();
-        /*while (iterator.hasNext()){
-            DataSet ds=iterator.next();
-            INDArray ia=ds.getFeatures();
+
+       /* while (iterator.hasNext()){
+            DataSet ds1=iterator.next();
+            INDArray ia=ds1.getFeatures();
             vec.add(ia);
         }*/
        /* double[][] features = new double[vec.size()][];
@@ -144,7 +171,10 @@ public class Transform {
         points.size();
         ClusterSet cs = kmc.applyTo(points);
 
+       /* Point p= (Point) Point.toPoints(r);
+        cs.nearestCluster(p);*/
         List<Cluster> clsterLst = cs.getClusters();
+
         for(Cluster c: clsterLst) {
 
             Point center = c.getCenter();
@@ -154,6 +184,7 @@ public class Transform {
             System.out.println(center.getArray());
 
         }
+       // dataNormalization.transform(r);
         System.out.println("end");
         //DataSetIteratorSplitter splitter = new DataSetIteratorSplitter(iterator,10000,0.8);
 
