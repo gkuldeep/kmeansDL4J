@@ -16,10 +16,18 @@ import java.util.*;
 
 public class ProductScheme {
 
+    public HashMap<String, String> getColumnMode() {
+        return columnMode;
+    }
+
+    public void setColumnMode(HashMap<String, String> columnMode) {
+        this.columnMode = columnMode;
+    }
+
     List<String>p;
     List<String>s;
     String[] missing;
-
+    HashMap<String,String>columnMode;
     public String[] getMissing() {
         return missing;
     }
@@ -152,7 +160,11 @@ public class ProductScheme {
 
         mode[7] = tenureMap.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 
-
+        HashMap<String,String >hmMode = new HashMap<>();
+        for(int i=0;i< mode.length;i++){
+            hmMode.put(columns[i],mode[i]);
+        }
+        setColumnMode(hmMode);
         setMissing(mode);
 
         Set<String> setPro = prodMap.keySet();
@@ -162,7 +174,7 @@ public class ProductScheme {
 
         setP(uniquePro);
         setS(uniqueScheme);
-       // createFile(iterator, mode);
+        createFile(iterator, mode);
         //String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\file.csv";
         //Dataset<Row>required = list.get(i).select("PRODUCT","prediction","Dist");
         //List<Row> clusterFile = modes.collectAsList();

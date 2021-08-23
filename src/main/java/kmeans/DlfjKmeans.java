@@ -54,7 +54,7 @@ public class DlfjKmeans  {
         //recordReaderTrain.asdasd
         List<Point>points=new ArrayList<>();
 
-        Schema schema = new Schema.Builder()
+        /*Schema schema = new Schema.Builder()
                 .addColumnCategorical("PRODUCT")
                 .addColumnCategorical("SCHEME")
                 .addColumnDouble("LOAN_AMOUNT_REQUESTED")
@@ -71,14 +71,15 @@ public class DlfjKmeans  {
                 .transform(new CategoricalToOneHotTransform("PRODUCT"))
                 .transform(new CategoricalToOneHotTransform("SCHEME"))
                 .build();
-        Schema outputSchema = tp.getFinalSchema();
+        Schema outputSchema = tp.getFinalSchema();*/
         List<INDArray>vectors = new ArrayList<>();
         String [] columns=it.next();
+        int totalColumns = columns.length;
+
 
         //DataSet alldata  = it.next();
 
-        List<HashMap<String, Integer> >map
-                = new ArrayList<>();
+
         HashMap<String,Integer>prodMap=new HashMap<>();
         HashMap<String,Integer>schemeMap=new HashMap<>();
         HashMap<String,Integer>amtMap=new HashMap<>();
@@ -87,11 +88,37 @@ public class DlfjKmeans  {
         HashMap<String,Integer>reqRateMap=new HashMap<>();
         HashMap<String,Integer>effRateMap=new HashMap<>();
         HashMap<String,Integer>emiValMap=new HashMap<>();
+        List<HashMap<String, Integer> >listOfMap
+                = new ArrayList<>();
+
+        for(int i=0;i<totalColumns;i++){
+            HashMap<String,Integer>colmsMap = new HashMap<>();
+            listOfMap.add(colmsMap);
+        }
         while (it.hasNext()){
               String[] row =  it.next();
              /*double[] doubleValues = Arrays.stream(row)
                      .mapToDouble(Double::parseDouble)
                      .toArray();*/
+
+            for(int i=0;i< row.length;i++){
+             if(!row[i].isEmpty()) {
+                 //if(listOfMap.size()>0) {
+                     HashMap<String, Integer> map = listOfMap.get(i);
+                     if (map.containsKey(row[i]) && map.size() > 0) {
+
+                         map.put(row[i], map.get(row[i]) + 1);
+
+                     }
+                // }
+                    else {
+                    //listOfMap.add(i).put(row[i], 1);
+                        //HashMap<String,Integer>hm = new HashMap<>();
+                        map.put(row[i],1);
+                        //listOfMap.add(hm);
+                    }
+             }
+            }
             if(!row[0].isEmpty()) {
                 if (prodMap.containsKey(row[0])) {
                     prodMap.put(row[0], prodMap.get(row[0]) + 1);
@@ -148,6 +175,8 @@ public class DlfjKmeans  {
                     tenureMap.put(row[7], 1);
                 }
             }
+
+
            // System.out.println(prodMap);
             /*for(String st:row){
                 HashMap<String,Integer>m = new HashMap<>();
@@ -178,6 +207,13 @@ public class DlfjKmeans  {
                 System.out.print(row[i]+" ");
              System.out.println("\n");*/
         }
+
+        String[] columnMode = new String[listOfMap.size()];
+        for(int i=0;i<listOfMap.size();i++){
+
+            columnMode[i]=listOfMap.get(i).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        }
+
      //   System.out.println(prodMap);
         String[] mode = new String[8];
         String maxProd=prodMap.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
@@ -245,7 +281,7 @@ public class DlfjKmeans  {
         //normalizeINDArray(xfeatures.getColumn(1));
         //NullWritable n = new NullWritable();
 
-        TransformProcess.Builder b = new TransformProcess.Builder(schema);
+        //TransformProcess.Builder b = new TransformProcess.Builder(schema);
         //b.categoricalToOneHot(xfeatures.getColumn(0));
         xfeatures.getColumn(0);
 

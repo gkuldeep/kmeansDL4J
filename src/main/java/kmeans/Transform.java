@@ -6,6 +6,7 @@ import org.datavec.api.records.reader.impl.csv.CSVRecordReader;
 import org.datavec.api.records.reader.impl.transform.TransformProcessRecordReader;
 import org.datavec.api.split.FileSplit;
 import org.datavec.api.transform.TransformProcess;
+import org.datavec.api.transform.analysis.DataAnalysis;
 import org.datavec.api.transform.condition.Condition;
 import org.datavec.api.transform.condition.ConditionOp;
 import org.datavec.api.transform.condition.column.ColumnCondition;
@@ -13,6 +14,7 @@ import org.datavec.api.transform.condition.column.DoubleColumnCondition;
 import org.datavec.api.transform.condition.column.IntegerColumnCondition;
 import org.datavec.api.transform.condition.column.StringColumnCondition;
 import org.datavec.api.transform.schema.Schema;
+import org.datavec.api.transform.transform.normalize.Normalize;
 import org.datavec.api.writable.DoubleWritable;
 import org.datavec.api.writable.IntWritable;
 import org.datavec.api.writable.NullWritable;
@@ -23,6 +25,7 @@ import org.deeplearning4j.clustering.cluster.ClusterSet;
 import org.deeplearning4j.clustering.cluster.Point;
 import org.deeplearning4j.clustering.kmeans.KMeansClustering;
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator;
+import org.nd4j.linalg.api.buffer.DataType;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
@@ -32,10 +35,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.serializer.NormalizerSerializer;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Transform {
 
@@ -52,10 +52,13 @@ public class Transform {
         ps.main();
         List<String> prdt = ps.getP();
         List<String> scm = ps.getS();
+        //HashMap<String,String>hm = ps.getColumnMode();
         String[] mode = ps.getMissing();
         Schema schema = new Schema.Builder()
                 .addColumnCategorical("PRODUCT",prdt)
                 .addColumnCategorical("SCHEME",scm)
+
+
                 //.addColumnString("",)
                 /*.addColumnString("LOAN_AMOUNT_REQUESTED")
                 .addColumnString("REQUESTED_TENURE")
@@ -88,29 +91,19 @@ public class Transform {
         TransformProcess transformProcess = new TransformProcess.Builder(schema)
                 .categoricalToOneHot("PRODUCT")//Applying one-hot encoding
                 .categoricalToOneHot("SCHEME")
+                .removeColumns("PRODUCT[5000161]")
+                .removeColumns("SCHEME[5000131]")
 
-                /*.conditionalReplaceValueTransform("LOAN_AMOUNT_REQUESTED",new DoubleWritable(Double.parseDouble(mode[2])),new DoubleColumnCondition("LOAN_AMOUNT_REQUESTED", ConditionOp.InSet, null))
-                .conditionalReplaceValueTransform("REQUESTED_TENURE",new IntWritable(Integer.parseInt(mode[3])),new IntegerColumnCondition("REQUESTED_TENURE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
-                .conditionalReplaceValueTransform("REQUESTED_RATE",new DoubleWritable(Double.parseDouble(mode[4])),new DoubleColumnCondition("REQUESTED_RATE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
-                .conditionalReplaceValueTransform("EFFECTIVE_INTEREST_RATE",new DoubleWritable(Double.parseDouble(mode[5])),new DoubleColumnCondition("EFFECTIVE_INTEREST_RATE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
-                .conditionalReplaceValueTransform("EMI_BASE_VALUE",new DoubleWritable(Double.parseDouble(mode[6])),new DoubleColumnCondition("EMI_BASE_VALUE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
-
-
-
-                .conditionalReplaceValueTransform("TENURE",new IntWritable(Integer.parseInt(mode[7])),new IntegerColumnCondition("TENURE", ConditionOp.InSet, new HashSet<>(Arrays.asList())))
-
-*/
                 .build();
 
-        String[] arr ={"5000013","5000015","500000","24","10","10.5","20000","15"};
+        /*String[] arr ={"5000013","5000015","500000","24","10","10.5","20000","15"};
         List<Writable> e=transformProcess.transformRawStringsToInput(arr);
         List<Writable> exe=transformProcess.execute(e);
-        //INDArray p =exe.toArray();
-         Object[] userData=  exe.toArray();
+        Object[] userData=  exe.toArray();
         double[] convertedArray = Arrays.stream(userData) // converts to a stream
                 .mapToDouble(num -> Double.parseDouble(num.toString())) // change each value to Double
                 .toArray();
-        INDArray r = Nd4j.createFromArray(convertedArray);
+        INDArray r = Nd4j.createFromArray(convertedArray);*/
 
 
         /*String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\tpJson.txt";
@@ -120,6 +113,7 @@ public class Transform {
         String tp=transformProcess.toJson();
         outputToCSV.append(tp);
         writer.write(outputToCSV.toString().getBytes("UTF-8"));*/
+
         String tp=transformProcess.toJson();
         FileWriter file1 = new FileWriter("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\tp.txt");
         file1.write(tp);
@@ -131,7 +125,7 @@ public class Transform {
         //Passing transformation process to convert the csv file
 
 
-        DataSetIterator iterator = new RecordReaderDataSetIterator(transformProcessRecordReader, 7000, 7, 0);
+        DataSetIterator iterator = new RecordReaderDataSetIterator(transformProcessRecordReader, 7000);
         //iterator.next();
 
 
@@ -149,6 +143,15 @@ public class Transform {
         NormalizerSerializer saver = NormalizerSerializer.getDefault();
         File file = new File("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\normalizer.txt");
         saver.write(dataNormalization,file);
+        //dataNormalization.
+
+        String path = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\NormalizerFile.txt";
+        StringBuilder outputToCSV = new StringBuilder();
+        //outputToCSV.append("PRODUCT,SCHEME,LOAN_AMOUNT_REQUESTED,REQUESTED_TENURE,REQUESTED_RATE,EFFECTIVE_INTEREST_RATE,EMI_BASE_VALUE,TENURE\n");
+        outputToCSV.append(dataNormalization);
+        FileOutputStream writer = new FileOutputStream(new File(path));
+        writer.write(outputToCSV.toString().getBytes("UTF-8"));
+
         INDArray a = ds.getFeatures();
 
        /* while (iterator.hasNext()){
@@ -169,22 +172,89 @@ public class Transform {
         KMeansClustering kmc = KMeansClustering.setup(clusterCount,maxIterationCount, Distance.EUCLIDEAN,useKplusplus);
         List<Point>points = Point.toPoints(a);
         points.size();
+        //points.ad
         ClusterSet cs = kmc.applyTo(points);
 
+
+
+        //String csModel=cs.toString();
        /* Point p= (Point) Point.toPoints(r);
         cs.nearestCluster(p);*/
         List<Cluster> clsterLst = cs.getClusters();
 
+       /* FileWriter csfile = new FileWriter("C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\csModel.txt");
+        csfile.write(csModel);
+        csfile.close();*/
+
+        List<INDArray>cen = new ArrayList<>();
+        List<Point>centerPoints = new ArrayList<>();
         for(Cluster c: clsterLst) {
 
             Point center = c.getCenter();
-            //System.out.println(center);
+            List<Point> allPoint=c.getPoints();
+            for(Point p:allPoint){
+                //p.getArray()
+            }
+
+           // centerPoints.add(center);
             System.out.println("----");
             //INDArray a = center.getArray();
-            System.out.println(center.getArray());
+            cen.add(center.getArray());
+            System.out.println(center.getId());
 
         }
+       /* String p = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\centroids.txt";
+        FileOutputStream fileOutputStream = new FileOutputStream(p);
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+        objectOutputStream.writeObject(cen);
+        objectOutputStream.close();*/
+
+        String p1 = "C:\\Users\\gkuld\\OneDrive\\Desktop\\point\\Centers\\centerPoints.txt";
+        FileOutputStream fileOutputStream1 = new FileOutputStream(p1);
+        ObjectOutputStream objectOutputStream1 = new ObjectOutputStream(fileOutputStream1);
+        objectOutputStream1.writeObject(centerPoints);
+        objectOutputStream1.close();
+
+        /*StringBuilder outputToCSV = new StringBuilder();
+        FileOutputStream writer = new FileOutputStream(new File(p));
+        outputToCSV.append(cen);
+        writer.write(outputToCSV.toString().getBytes("UTF-8"));*/
        // dataNormalization.transform(r);
+
+        for(Cluster c: clsterLst) {
+//
+
+            //Point center = c.getCenter();
+            List<Point> pointsCluster = c.getPoints();
+
+            System.out.println(pointsCluster.size());
+
+            Collections.sort(pointsCluster, (o1, o2) -> {
+                c.getCenter().getArray().castTo(DataType.FLOAT);
+                if (c.getDistanceToCenter(o1) < c.getDistanceToCenter(o2)) {
+                    return 1;
+                } else if (c.getDistanceToCenter(o1) > c.getDistanceToCenter(o2)) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            });
+            List<Point> pointsCluster1 = c.getPoints();
+        }
+
+        HashMap<String,List<Point>>hm = new HashMap<>();
+        for(Cluster c:clsterLst){
+            List<Point> pointsCluster1 = c.getPoints();
+            hm.put(c.getId(),pointsCluster1);
+
+        }
+
+
+        Map<String,String> m=cs.getPointDistribution();
+
+       /* for (Map.Entry<String,String> entry : m.entrySet())
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());*/
         System.out.println("end");
         //DataSetIteratorSplitter splitter = new DataSetIteratorSplitter(iterator,10000,0.8);
 
